@@ -3,33 +3,78 @@
   <head>
     <meta charset="utf-8" />
     <title>Todo List</title>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-   document.querySelector('#new-task').onsubmit = () => {
-   const cb = document.createElement("INPUT");
-cb.setAttribute("type", "checkbox");
+    <style>
+        #tasks li {
+            list-style-type: none;
+        }
+        #tasks li input[type="checkbox"]:checked + label {
+            text-decoration-line: line-through;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#new-task').onsubmit = () => {
 
-            const li = document.createElement('li');
-            li.appendChild(cb);
-li.innerHTML += document.querySelector('#task').value;
+                const cb = document.createElement("INPUT");
+                cb.setAttribute("type", "checkbox");
+                cb.onclick = toggleCheckbox; 
 
-            document.querySelector('#tasks').append(li);
+                const li = document.createElement('li');
+                li.appendChild(cb);
+                
+                const label = document.createElement('label');
+                label.textContent = document.querySelector('#task').value;
+                li.appendChild(label);
 
-            document.querySelector('#task').value = '';
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'x';
+                deleteButton.onclick = deleteTask;
+                li.appendChild(deleteButton);
+                
+                document.querySelector('#tasks').append(li);
 
-            return false;
-        };
+                
+                document.querySelector('#task').value = '';
 
-    });
+                return false;
+            };
+
+            function toggleCheckbox() {
+                const checkboxes = document.querySelectorAll('#tasks li input[type="checkbox"]');
+                for (let checkbox of checkboxes) {
+                    const label = checkbox.parentNode.querySelector('label');
+                    label.style.textDecorationLine = checkbox.checked ? 'line-through' : 'none';
+                }
+            }
+
+            function deleteTask() {
+                this.parentNode.remove();
+            }
+
+            document.querySelector('#complete-all').onclick = () => {
+                const checkboxes = document.querySelectorAll('#tasks li input[type="checkbox"]');
+                for (let checkbox of checkboxes) {
+                    checkbox.checked = true;
+                }
+                toggleCheckbox();
+            };
+
+            document.querySelector('#delete-completed').onclick = () => {
+                const completedCheckboxes = document.querySelectorAll('#tasks li input[type="checkbox"]:checked');
+                completedCheckboxes.forEach(checkbox => {
+                    checkbox.parentNode.remove();
+                });
+            };
+        });
     </script>
-
   </head>
   <body>
-<form id="new-task">
-        <input id="task" autocomplete="off"autofocus placeholder="New Task" type="text">
+    <form id="new-task">
+        <input id="task" autocomplete="off" autofocus placeholder="New Task" type="text">
         <input type="submit" value="Add Todo">
         <br><br>
-        <button type="button" >Complete All</button>
+        <button type="button" id="complete-all">Complete All</button>
+        <button type="button" id="delete-completed">Delete Completed</button>
     </form>
     <ol id="tasks">
     </ol>
